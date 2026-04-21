@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reel Scripts">
+<meta name="theme-color" content="#0F0D0B">
+<title>Reel Script Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --warm: #F5F0E8;
+  --deep: #0F0D0B;
+  --ink: #2C2520;
+  --muted: #8A7F74;
+  --border: #E2D9CC;
+  --gold: #C9A84C;
+  --gold-l: #E8C97A;
+  --sage: #7A9E7E;
+  --sage-l: #EAF3EB;
+  --violet: #8B78C4;
+  --violet-l: #EEE9FA;
+  --rose: #C4727A;
+  --rose-l: #F9ECED;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--deep); }
+body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); overscroll-behavior: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+@keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0}to{opacity:1} }
+
+/* ── App shell ── */
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: var(--cream); }
+
+/* ── Header ── */
+.hdr {
+  background: var(--deep);
+  padding: calc(var(--safe-top) + 14px) 20px 14px;
+  display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0; position: relative; z-index: 50;
+}
+.hdr-mark {
+  width: 34px; height: 34px; background: var(--gold); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--deep);
+  flex-shrink: 0;
+}
+.hdr-name { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--cream); }
+.hdr-sub  { font-size: 10px; color: var(--gold); letter-spacing: .1em; text-transform: uppercase; margin-top: 1px; }
+.hdr-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.settings-btn {
+  width: 34px; height: 34px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--muted);
+}
+
+/* ── Tab bar ── */
+.tabs {
+  display: flex; background: var(--deep); border-top: 1px solid #1E1B18;
+  flex-shrink: 0;
+}
+.tab {
+  flex: 1; padding: 10px 8px; display: flex; flex-direction: column; align-items: center;
+  gap: 3px; cursor: pointer; border: none; background: transparent;
+  font-family: 'DM Sans', system-ui, sans-serif; transition: all .15s;
+}
+.tab svg { width: 20px; height: 20px; }
+.tab-label { font-size: 10px; font-weight: 500; letter-spacing: .03em; }
+.tab.active { color: var(--gold); }
+.tab:not(.active) { color: #4A4540; }
+
+/* ── Screens ── */
+.screen { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.screen.active { display: flex; flex-direction: column; animation: fadeIn .2s ease; }
+
+/* ── Generate screen ── */
+.gen-top {
+  background: var(--deep); padding: 16px 20px 20px;
+  flex-shrink: 0;
+}
+.gen-label { font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.topic-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.topic-scroll::-webkit-scrollbar { display: none; }
+.topic-chip {
+  flex-shrink: 0; padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  cursor: pointer; border: 1px solid #3A3530; background: transparent; color: #8A7F74;
+  font-family: 'DM Sans', system-ui, sans-serif; transition: all .15s; white-space: nowrap;
+}
+.topic-chip.active { background: var(--gold); border-color: var(--gold); color: var(--deep); font-weight: 600; }
+
+.gen-btn {
+  width: 100%; margin-top: 14px; padding: 14px; border-radius: 12px; border: none;
+  background: var(--gold); color: var(--deep); font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 8px; transition: all .2s; -webkit-appearance: none;
+}
+.gen-btn:active { transform: scale(.98); background: var(--gold-l); }
+.gen-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.gen-spinner { width: 16px; height: 16px; border: 2px solid rgba(15,13,11,.3); border-top-color: var(--deep); border-radius: 50%; animation: spin 1s linear infinite; }
+
+.cards-area { flex: 1; padding: 16px; }
+
+/* ── Script card ── */
+.scard {
+  background: white; border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+  border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(26,23,20,.06);
+  animation: slideUp .25s ease;
+}
+.scard.rec { border-left: 4px solid var(--sage); }
+.scard.post { border-left: 4px solid var(--violet); opacity: .72; }
+
+.scard-hdr {
+  background: var(--warm); border-bottom: 1px solid var(--border);
+  padding: 11px 14px;
+}
+.scard-hdr-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+.scard-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: .1em; text-transform: uppercase; }
+.scard-topic { font-size: 11px; color: var(--muted); background: var(--cream); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; }
+.scard-badge {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 9px;
+}
+.badge-ready   { background: var(--cream);     color: var(--muted);   border: 1px solid var(--border); }
+.badge-rec     { background: var(--sage-l);    color: var(--sage);    border: 1px solid rgba(122,158,126,.35); }
+.badge-post    { background: var(--violet-l);  color: var(--violet);  border: 1px solid rgba(139,120,196,.35); }
+
+.scard-actions { display: flex; gap: 6px; }
+.act-btn {
+  flex: 1; padding: 7px 4px; border-radius: 8px; border: 1px solid; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', system-ui, sans-serif; transition: all .15s; text-align: center;
+  -webkit-appearance: none;
+}
+.act-btn:active { transform: scale(.96); }
+.btn-rec  { background: var(--sage-l);   color: var(--sage);   border-color: rgba(122,158,126,.4); }
+.btn-rec.on  { background: var(--sage);  color: white; border-color: var(--sage); }
+.btn-post { background: var(--violet-l); color: var(--violet); border-color: rgba(139,120,196,.4); }
+.btn-post.on { background: var(--violet); color: white; border-color: var(--violet); }
+.btn-rej  { background: var(--rose-l);   color: var(--rose);   border-color: rgba(196,114,122,.4); flex: 0; padding: 7px 12px; }
+
+.scard-body { padding: 14px; }
+.sec-block { margin-bottom: 14px; }
+.sec-block:last-child { margin-bottom: 0; }
+.sec-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.sec-label { font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.copy-btn {
+  display: flex; align-items: center; gap: 4px; background: transparent;
+  border: 1px solid var(--border); color: var(--muted); padding: 4px 10px;
+  border-radius: 6px; font-size: 11px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', system-ui, sans-serif; transition: all .15s; -webkit-appearance: none;
+}
+.copy-btn.ok { background: var(--sage); border-color: var(--sage); color: white; }
+.copy-btn:active { transform: scale(.95); }
+.sec-content {
+  background: var(--warm); border: 1px solid var(--border); border-radius: 9px;
+  padding: 11px 13px; font-size: 14px; line-height: 1.65; color: var(--ink); white-space: pre-wrap;
+}
+.sec-content.script  { font-size: 15px; line-height: 1.75; }
+.sec-content.thumb   { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; line-height: 1.4; color: #1A1714; }
+.sec-content.caption { font-size: 13px; line-height: 1.7; }
+
+/* Loading shimmer */
+.shimmer-wrap { padding: 14px; }
+.shim {
+  background: linear-gradient(90deg,#F0EBE3 25%,#E8E0D4 50%,#F0EBE3 75%);
+  background-size: 200% 100%; animation: shimmer 1.8s infinite; border-radius: 6px;
+  height: 13px; margin-bottom: 8px;
+}
+
+/* ── Queue / Tracker screen ── */
+.tracker-pad { padding: 16px; }
+.tracker-stats {
+  background: white; border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; box-shadow: 0 2px 8px rgba(26,23,20,.05);
+}
+.stat-box { text-align: center; padding: 10px; background: var(--warm); border-radius: 10px; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+.stat-lbl { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+.tracker-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px; padding: 0 2px;
+}
+.queue-item {
+  background: white; border: 1px solid var(--border); border-radius: 10px;
+  padding: 11px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+  font-size: 13px;
+}
+.q-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.q-dot.gen  { background: var(--gold); animation: pulse 1.2s infinite; }
+.q-dot.done { background: var(--sage); }
+.q-dot.rec  { background: var(--sage); }
+.q-dot.post { background: var(--violet); }
+.q-dot.rej  { background: var(--rose); }
+.q-title { flex: 1; color: var(--ink); font-weight: 400; }
+.q-status { font-size: 11px; color: var(--muted); }
+
+/* ── Settings screen ── */
+.settings-pad { padding: 20px 16px; }
+.settings-card { background: white; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(26,23,20,.05); }
+.settings-row { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.settings-row:last-child { border-bottom: none; }
+.settings-row-label { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.settings-row-sub { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+.settings-input {
+  width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: 9px;
+  font-family: 'DM Mono', monospace; font-size: 13px; background: var(--warm); color: var(--ink);
+  outline: none; -webkit-appearance: none;
+}
+.settings-input:focus { border-color: var(--gold); }
+.save-btn {
+  width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--gold);
+  color: var(--deep); font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px;
+  font-weight: 700; cursor: pointer; margin-top: 8px; -webkit-appearance: none;
+}
+.save-btn:active { background: var(--gold-l); transform: scale(.98); }
+.key-saved { color: var(--sage); font-size: 12px; margin-top: 6px; font-weight: 500; }
+.info-box {
+  background: rgba(201,168,76,.08); border: 1px solid rgba(201,168,76,.25);
+  border-radius: 10px; padding: 13px; font-size: 12.5px; line-height: 1.65; color: var(--ink);
+}
+.info-box a { color: var(--gold); }
+.info-step { display: flex; gap: 10px; margin-bottom: 8px; }
+.info-step:last-child { margin-bottom: 0; }
+.step-num { width: 20px; height: 20px; background: var(--gold); color: var(--deep); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Empty state ── */
+.empty { text-align: center; padding: 56px 24px; color: var(--muted); }
+.empty-icon { font-size: 40px; margin-bottom: 14px; opacity: .4; }
+.empty-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--ink); margin-bottom: 8px; }
+.empty-text { font-size: 13px; line-height: 1.6; max-width: 280px; margin: 0 auto; }
+
+/* ── Error ── */
+.err-box { background: #FFF5F5; border: 1px solid #FFCDD2; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #C62828; margin-bottom: 14px; line-height: 1.5; }
+
+/* ── Undo toast ── */
+.toast {
+  position: fixed; bottom: calc(var(--safe-bot) + 80px); left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--cream); padding: 11px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35); z-index: 999; white-space: nowrap;
+  animation: slideUp .22s ease;
+}
+.toast-undo { color: var(--gold-l); cursor: pointer; font-weight: 700; border: none; background: none; font-family: inherit; font-size: 13px; }
+
+/* Bottom safe area padding */
+.cards-area, .tracker-pad, .settings-pad { padding-bottom: calc(var(--safe-bot) + 80px); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-mark">V</div>
+    <div>
+      <div class="hdr-name">Reel Scripts</div>
+      <div class="hdr-sub">@veenajetti</div>
+    </div>
+    <div class="hdr-right">
+      <div class="settings-btn" onclick="switchTab('settings')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate screen -->
+  <div class="screen active" id="screen-generate">
+    <div class="gen-top">
+      <div class="gen-label">Choose Topic</div>
+      <div class="topic-scroll" id="topicScroll"></div>
+      <button class="gen-btn" id="genBtn" onclick="generate()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Generate Script
+      </button>
+    </div>
+    <div class="cards-area" id="cardsArea">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon">✍️</div>
+        <div class="empty-title">Ready to generate</div>
+        <div class="empty-text">Pick a topic above and tap Generate Script. Set your API key in Settings first.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tracker screen -->
+  <div class="screen" id="screen-tracker">
+    <div class="tracker-pad">
+      <div class="tracker-stats">
+        <div class="stat-box"><div class="stat-num" id="tGenerated" style="color:var(--gold)">0</div><div class="stat-lbl">Generated</div></div>
+        <div class="stat-box"><div class="stat-num" id="tRecorded" style="color:var(--sage)">0</div><div class="stat-lbl">🎥 Recorded</div></div>
+        <div class="stat-box"><div class="stat-num" id="tPosted" style="color:var(--violet)">0</div><div class="stat-lbl">✅ Posted</div></div>
+        <div class="stat-box"><div class="stat-num" id="tRejected" style="color:var(--rose)">0</div><div class="stat-lbl">✕ Rejected</div></div>
+      </div>
+      <div class="tracker-section-label">Script History</div>
+      <div id="queueList">
+        <div class="queue-item" style="color:var(--muted);font-size:13px;">No scripts yet — generate one on the first tab.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings screen -->
+  <div class="screen" id="screen-settings">
+    <div class="settings-pad">
+      <div class="settings-card">
+        <div class="settings-row">
+          <div class="settings-row-label">Anthropic API Key</div>
+          <div class="settings-row-sub">Your key is stored only on this device and never sent anywhere except directly to Anthropic's API.</div>
+          <input class="settings-input" type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+          <button class="save-btn" onclick="saveKey()">Save Key</button>
+          <div class="key-saved" id="keySaved" style="display:none">✓ Key saved to this device</div>
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-bottom:16px">
+        <div style="font-weight:600;margin-bottom:10px;font-size:13px;">How to set up (one time)</div>
+        <div class="info-step"><div class="step-num">1</div><div>Go to <strong>console.anthropic.com</strong> → API Keys → Create Key</div></div>
+        <div class="info-step"><div class="step-num">2</div><div>Copy the key (starts with <code style="background:rgba(201,168,76,.15);padding:1px 5px;border-radius:4px">sk-ant-</code>)</div></div>
+        <div class="info-step"><div class="step-num">3</div><div>Paste it above and tap Save Key</div></div>
+        <div class="info-step"><div class="step-num">4</div><div>In Safari: tap <strong>Share → Add to Home Screen</strong> to use this like a native app</div></div>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-row">
+          <div class="settings-row-label">Script Voice</div>
+          <div class="settings-row-sub">All scripts are generated in Veena Jetti's voice — punchy, mid-thought, science-backed, emotionally resonant. Female biological advantage stated as flat fact with numbers.</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-label">Version</div>
+          <div style="font-size:13px;color:var(--muted);">Reel Script Generator v1.0 · claude-sonnet-4-20250514</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tabs" style="padding-bottom:var(--safe-bot)">
+    <button class="tab active" id="tab-generate" onclick="switchTab('generate')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="tab-label">Generate</span>
+    </button>
+    <button class="tab" id="tab-tracker" onclick="switchTab('tracker')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="tab-label">Tracker</span>
+    </button>
+    <button class="tab" id="tab-settings" onclick="switchTab('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="tab-label">Settings</span>
+    </button>
+  </div>
+
+  <!-- Undo toast -->
+  <div class="toast" id="undoToast" style="display:none">
+    Script rejected <button class="toast-undo" onclick="undoReject()">Undo</button>
+  </div>
+</div>
+
+<script>
+// ── State ──
+const TOPICS = {
+  biology:    { emoji:'🧬', label:'Female Biology',       prompt:'a specific surprising female biological advantage over males — immune strength, cellular resilience, pain backup systems, survival rates, or chromosomal advantages. Use a specific number from a real study.' },
+  sisterhood: { emoji:'👯', label:'Sisterhood & Sisters', prompt:'the science of sisterhood, female friendships, having sisters, or female social bonds. Include a specific statistic from peer-reviewed research.' },
+  exercise:   { emoji:'💪', label:'Exercise & Fitness',   prompt:'how women get more cardiovascular or strength benefit from exercise than men — capillary density, mortality reduction percentages, or half-dose efficiency differences.' },
+  heart:      { emoji:'❤️', label:'Heart & Cardio',       prompt:'a specific female heart advantage — ejection fraction, cardiac cell preservation, contractile strain differences vs men. Use a specific peer-reviewed study.' },
+  immune:     { emoji:'🛡️', label:'Immune System',        prompt:'female immune system superiority — X chromosome advantages, antibody production differences, vaccine response data, or T-cell resilience. Use a specific number.' },
+  longevity:  { emoji:'⏳', label:'Longevity & Aging',    prompt:'why women live longer — telomere length at birth, inflammation control, supercentenarian statistics, or biological aging clock data.' },
+  history:    { emoji:'📜', label:'Erased Women',         prompt:'a specific erased or uncredited woman in history who made a major scientific, military, or cultural discovery that was stolen, ignored, or attributed to a man.' },
+  money:      { emoji:'💰', label:'Women & Money',        prompt:'women and negotiation, the pay gap, financial power dynamics, or generational wealth building. Use peer-reviewed data with specific numbers.' },
+  brain:      { emoji:'🧠', label:'Brain & Neuroscience', prompt:'a female brain advantage — language architecture, bilateral processing, pregnancy neural pruning, or emotional recognition accuracy. Use specific percentages.' },
+  surprise:   { emoji:'✨', label:'Surprise Me',          prompt:'a surprising, counterintuitive, little-known biological or historical advantage women have that most people don\'t know about. Be specific with numbers.' },
+};
+
+const SYSTEM = `You are a script writer for Veena Jetti (@veenajetti), an Instagram Reels creator focused on women's biology, generational wealth, and sisterhood.
+
+Your ENTIRE response must be exactly this format with these exact labels on their own lines:
+
+LOOP:
+[the mid-sentence hook — starts with ... — seamlessly opens and closes the reel]
+
+SCRIPT:
+[full unbroken prose ~200-260 words — no headers — ends with the FIRST HALF of the loop sentence trailing off with an em dash —]
+
+THUMBNAIL:
+[5-8 bold punchy words, counterintuitive, like "Men lose 64 million heart cells a year"]
+
+CAPTION:
+[2-3 sentences describing the finding, ending with a real PubMed or DOI URL. No hashtags.]
+
+Rules: every claim must reference a real peer-reviewed study with a verifiable URL. Voice is punchy, mid-thought, emotionally resonant. State biological facts flatly with specific numbers. Flip the male-default assumption wherever possible.`;
+
+let state = {
+  topic: 'biology',
+  cards: [],
+  stats: { generated: 0, recorded: 0, posted: 0, rejected: 0 },
+  reelNum: 91,
+  undoCard: null,
+  undoTimer: null,
+};
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded', () => {
+  buildTopics();
+  loadKey();
+  renderStats();
+});
+
+function buildTopics() {
+  const scroll = document.getElementById('topicScroll');
+  Object.entries(TOPICS).forEach(([key, t]) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-chip' + (key === state.topic ? ' active' : '');
+    btn.dataset.topic = key;
+    btn.textContent = t.emoji + ' ' + t.label;
+    btn.onclick = () => selectTopic(key);
+    scroll.appendChild(btn);
+  });
+}
+
+function selectTopic(key) {
+  state.topic = key;
+  document.querySelectorAll('.topic-chip').forEach(c => c.classList.toggle('active', c.dataset.topic === key));
+}
+
+// ── Tab switching ──
+function switchTab(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ── API key ──
+function saveKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val) return;
+  localStorage.setItem('vj_api_key', val);
+  const saved = document.getElementById('keySaved');
+  saved.style.display = 'block';
+  setTimeout(() => { saved.style.display = 'none'; }, 3000);
+}
+
+function loadKey() {
+  const k = localStorage.getItem('vj_api_key');
+  if (k) document.getElementById('apiKeyInput').value = k;
+}
+
+function getKey() {
+  return localStorage.getItem('vj_api_key') || '';
+}
+
+// ── Generate ──
+async function generate() {
+  const key = getKey();
+  if (!key) {
+    showError('No API key set. Go to Settings → paste your Anthropic API key → Save.');
+    return;
+  }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="gen-spinner"></div> Generating…';
+  clearError();
+
+  // Remove empty state
+  const empty = document.getElementById('emptyState');
+  if (empty) empty.remove();
+
+  // Add shimmer card
+  state.reelNum++;
+  const shimId = 'shim-' + Date.now();
+  const shimCard = document.createElement('div');
+  shimCard.className = 'scard';
+  shimCard.id = shimId;
+  shimCard.innerHTML = `
+    <div class="scard-hdr" style="padding:11px 14px">
+      <div style="font-family:monospace;font-size:11px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase">Reel #${state.reelNum} · Generating…</div>
+    </div>
+    <div class="shimmer-wrap">
+      <div class="shim" style="width:60%;margin-bottom:14px"></div>
+      <div class="shim"></div><div class="shim" style="width:85%"></div>
+      <div class="shim"></div><div class="shim" style="width:70%"></div>
+      <div class="shim" style="width:50%;margin-top:14px"></div>
+      <div class="shim" style="width:80%;margin-top:14px"></div><div class="shim" style="width:60%"></div>
+    </div>`;
+  const area = document.getElementById('cardsArea');
+  area.insertBefore(shimCard, area.firstChild);
+
+  const topic = state.topic;
+  const topicData = TOPICS[topic];
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        system: SYSTEM,
+        messages: [{ role: 'user', content: `Write one complete Instagram Reel script for Veena Jetti about: ${topicData.prompt}\n\nOutput only the four labeled sections. No extra commentary.` }]
+      })
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`API ${res.status}: ${txt.slice(0, 150)}`);
+    }
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+    const raw = data.content?.[0]?.text || '';
+    const parsed = parseRaw(raw);
+    if (!parsed.script) throw new Error('Could not parse script from response. Try again.');
+
+    shimCard.remove();
+    const card = { id: Date.now(), num: state.reelNum, topic, topicLabel: topicData.label, status: 'ready', ...parsed };
+    state.cards.unshift(card);
+    state.stats.generated++;
+    addQueueItem(card);
+    renderCard(card, area);
+    renderStats();
+
+  } catch (e) {
+    shimCard.remove();
+    state.reelNum--;
+    showError(e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Generate Script';
+}
+
+function parseRaw(text) {
+  const get = (label, next) => {
+    const re = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\n(?:' + next + '):|$)', 'i');
+    const m = text.match(re);
+    return m ? m[1].trim() : '';
+  };
+  return {
+    loop:      get('LOOP',      'SCRIPT|THUMBNAIL|CAPTION'),
+    script:    get('SCRIPT',    'THUMBNAIL|CAPTION'),
+    thumbnail: get('THUMBNAIL', 'CAPTION'),
+    caption:   get('CAPTION',   '$'),
+  };
+}
+
+// ── Render card ──
+function renderCard(card, container) {
+  const el = document.createElement('div');
+  el.className = 'scard' + (card.status === 'recorded' ? ' rec' : card.status === 'posted' ? ' post' : '');
+  el.id = 'card-' + card.id;
+  el.innerHTML = cardHTML(card);
+  container.insertBefore(el, container.firstChild);
+}
+
+function cardHTML(card) {
+  const badgeClass = card.status === 'recorded' ? 'badge-rec' : card.status === 'posted' ? 'badge-post' : 'badge-ready';
+  const badgeLabel = card.status === 'recorded' ? '🎥 Recorded' : card.status === 'posted' ? '✅ Posted' : 'Ready';
+  const recOn = card.status === 'recorded' || card.status === 'posted';
+  const postOn = card.status === 'posted';
+
+  return `
+    <div class="scard-hdr">
+      <div class="scard-hdr-top">
+        <span class="scard-num">Reel #${card.num}</span>
+        <span class="scard-topic">${card.topicLabel}</span>
+      </div>
+      <div class="scard-badge ${badgeClass}">${badgeLabel}</div>
+      <div class="scard-actions">
+        <button class="act-btn btn-rec ${recOn?'on':''}" onclick="setStatus(${card.id},'recorded')">🎥 Recorded</button>
+        <button class="act-btn btn-post ${postOn?'on':''}" onclick="setStatus(${card.id},'posted')">✅ Posted</button>
+        <button class="act-btn btn-rej" onclick="rejectCard(${card.id})">✕</button>
+      </div>
+    </div>
+    <div class="scard-body">
+      ${secHTML('Loop Open / Close', card.loop, '')}
+      ${secHTML('Full Script', card.script, 'script')}
+      ${secHTML('Thumbnail', card.thumbnail, 'thumb')}
+      ${secHTML('Caption + Source', card.caption, 'caption')}
+    </div>`;
+}
+
+function secHTML(label, content, cls) {
+  if (!content) return '';
+  const safe = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `
+    <div class="sec-block">
+      <div class="sec-row">
+        <span class="sec-label">${label}</span>
+        <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(content)})">⎘ Copy</button>
+      </div>
+      <div class="sec-content ${cls}">${safe}</div>
+    </div>`;
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = '⎘ Copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+// ── Status ──
+function setStatus(id, action) {
+  const card = state.cards.find(c => c.id === id);
+  if (!card) return;
+  const prev = card.status;
+
+  if (action === 'recorded') {
+    if (card.status === 'posted') return; // can't unrecord a posted
+    card.status = card.status === 'recorded' ? 'ready' : 'recorded';
+    if (card.status === 'recorded') state.stats.recorded++;
+    else state.stats.recorded--;
+  } else if (action === 'posted') {
+    if (card.status === 'posted') {
+      card.status = 'recorded';
+      state.stats.posted--;
+    } else {
+      if (card.status === 'ready') { card.status = 'recorded'; state.stats.recorded++; }
+      card.status = 'posted';
+      state.stats.posted++;
+    }
+  }
+
+  refreshCard(card);
+  updateQueueItem(card);
+  renderStats();
+}
+
+function refreshCard(card) {
+  const el = document.getElementById('card-' + card.id);
+  if (!el) return;
+  el.className = 'scard' + (card.status === 'recorded' ? ' rec' : card.status === 'posted' ? ' post' : '');
+  el.innerHTML = cardHTML(card);
+}
+
+// ── Reject ──
+function rejectCard(id) {
+  const card = state.cards.find(c => c.id === id);
+  if (!card) return;
+  state.cards = state.cards.filter(c => c.id !== id);
+  state.stats.rejected++;
+  const el = document.getElementById('card-' + id);
+  if (el) el.remove();
+  state.undoCard = card;
+  if (state.undoTimer) clearTimeout(state.undoTimer);
+  const toast = document.getElementById('undoToast');
+  toast.style.display = 'flex';
+  state.undoTimer = setTimeout(() => { toast.style.display = 'none'; state.undoCard = null; }, 4500);
+  updateQueueItem({ ...card, status: 'rejected' });
+  renderStats();
+}
+
+function undoReject() {
+  if (!state.undoCard) return;
+  const card = state.undoCard;
+  state.cards.unshift(card);
+  state.stats.rejected--;
+  const area = document.getElementById('cardsArea');
+  renderCard(card, area);
+  updateQueueItem(card);
+  document.getElementById('undoToast').style.display = 'none';
+  state.undoCard = null;
+  if (state.undoTimer) clearTimeout(state.undoTimer);
+  renderStats();
+}
+
+// ── Queue / Tracker ──
+function addQueueItem(card) {
+  const list = document.getElementById('queueList');
+  // Remove placeholder
+  const placeholder = list.querySelector('[data-placeholder]');
+  if (placeholder) placeholder.remove();
+
+  const item = document.createElement('div');
+  item.className = 'queue-item';
+  item.id = 'qi-' + card.id;
+  item.innerHTML = `<div class="q-dot done"></div><div class="q-title">Reel #${card.num} — ${card.topicLabel}</div><div class="q-status">Ready</div>`;
+  list.insertBefore(item, list.firstChild);
+}
+
+function updateQueueItem(card) {
+  const item = document.getElementById('qi-' + card.id);
+  if (!item) return;
+  const dot = item.querySelector('.q-dot');
+  const status = item.querySelector('.q-status');
+  const statMap = { ready:['done','Ready'], recorded:['rec','🎥 Recorded'], posted:['post','✅ Posted'], rejected:['rej','✕ Rejected'] };
+  const [cls, lbl] = statMap[card.status] || statMap.ready;
+  dot.className = 'q-dot ' + cls;
+  status.textContent = lbl;
+}
+
+function renderStats() {
+  ['Generated','Recorded','Posted','Rejected'].forEach(k => {
+    const el = document.getElementById('t' + k);
+    if (el) el.textContent = state.stats[k.toLowerCase()] ?? 0;
+  });
+}
+
+// ── Error ──
+function showError(msg) {
+  clearError();
+  const area = document.getElementById('cardsArea');
+  const div = document.createElement('div');
+  div.className = 'err-box'; div.id = 'errBox'; div.textContent = '⚠️ ' + msg;
+  area.insertBefore(div, area.firstChild);
+}
+function clearError() {
+  const e = document.getElementById('errBox'); if (e) e.remove();
+}
+</script>
+</body>
+</html>
