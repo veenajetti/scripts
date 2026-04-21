@@ -380,23 +380,20 @@ const TOPICS = {
   surprise:   { emoji:'✨', label:'Surprise Me',          prompt:'a surprising, counterintuitive, little-known biological or historical advantage women have that most people don\'t know about. Be specific with numbers.' },
 };
 
-const SYSTEM = `You are a script writer for Veena Jetti (@veenajetti), an Instagram Reels creator focused on women's biology, generational wealth, and sisterhood.
+const SYSTEM = `You are a script writer for Veena Jetti (@veenajetti), an Instagram Reels creator on women's biology, generational wealth, and sisterhood.
 
-Your ENTIRE response must be exactly this format with these exact labels on their own lines:
-
-LOOP:
-[the mid-sentence hook — starts with ... — seamlessly opens and closes the reel]
+Respond with ONLY these three labeled sections:
 
 SCRIPT:
-[full unbroken prose ~200-260 words — no headers — ends with the FIRST HALF of the loop sentence trailing off with an em dash —]
+Full punchy prose ~200-260 words, no headers. The last two lines must be: the final sentence trailing off with an em dash — then on the next line the loop completion starting with an ellipsis like: ...because what sisters do to emotional expression in a household is architectural. They raise the floor for everyone.
 
 THUMBNAIL:
-[5-8 bold punchy words, counterintuitive, like "Men lose 64 million heart cells a year"]
+5-8 bold punchy words. Example: "Men lose 64 million heart cells a year"
 
 CAPTION:
-[2-3 sentences describing the finding, ending with a real PubMed or DOI URL. No hashtags.]
+2-3 sentences + a real PubMed or DOI URL. No hashtags.
 
-Rules: every claim must reference a real peer-reviewed study with a verifiable URL. Voice is punchy, mid-thought, emotionally resonant. State biological facts flatly with specific numbers. Flip the male-default assumption wherever possible.`;
+Voice: punchy, mid-thought, emotionally resonant. Biological facts stated flatly with specific numbers. Every claim must have a real verifiable peer-reviewed source.`;
 
 let state = {
   topic: 'biology',
@@ -552,7 +549,7 @@ function parseRaw(text) {
     return m ? m[1].trim() : '';
   };
   return {
-    loop:      get('LOOP',      'SCRIPT|THUMBNAIL|CAPTION'),
+    loop:      '',
     script:    get('SCRIPT',    'THUMBNAIL|CAPTION'),
     thumbnail: get('THUMBNAIL', 'CAPTION'),
     caption:   get('CAPTION',   '$'),
@@ -588,7 +585,6 @@ function cardHTML(card) {
       </div>
     </div>
     <div class="scard-body">
-      ${secHTML('Loop Open / Close', card.loop, '')}
       ${secHTML('Full Script', card.script, 'script')}
       ${secHTML('Thumbnail', card.thumbnail, 'thumb')}
       ${secHTML('Caption + Source', card.caption, 'caption')}
