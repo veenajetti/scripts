@@ -337,7 +337,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); overscr
         </div>
         <div class="settings-row">
           <div class="settings-row-label">Version</div>
-          <div style="font-size:13px;color:var(--muted);">Reel Script Generator v1.0 · claude-sonnet-4-20250514</div>
+          <div style="font-size:13px;color:var(--muted);">Reel Script Generator v1.0 · claude-sonnet-4-5</div>
         </div>
       </div>
     </div>
@@ -508,7 +508,7 @@ async function generate() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 1200,
         system: SYSTEM,
         messages: [{ role: 'user', content: `Write one complete Instagram Reel script for Veena Jetti about: ${topicData.prompt}\n\nOutput only the four labeled sections. No extra commentary.` }]
