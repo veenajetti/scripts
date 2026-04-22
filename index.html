@@ -395,6 +395,31 @@ CAPTION:
 
 Voice: punchy, mid-thought, emotionally resonant. Biological facts stated flatly with specific numbers. Every claim must have a real verifiable peer-reviewed source.`;
 
+// ── Persistence ──
+function saveState() {
+  try {
+    localStorage.setItem('vj_state', JSON.stringify({
+      cards: state.cards,
+      stats: state.stats,
+      reelNum: state.reelNum,
+      topic: state.topic,
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('vj_state');
+    if (saved) {
+      const s = JSON.parse(saved);
+      state.cards   = s.cards   || [];
+      state.stats   = s.stats   || { generated:0, recorded:0, posted:0, rejected:0 };
+      state.reelNum = s.reelNum || 91;
+      state.topic   = s.topic   || 'biology';
+    }
+  } catch(e) {}
+}
+
 let state = {
   topic: 'biology',
   cards: [],
@@ -406,9 +431,22 @@ let state = {
 
 // ── Init ──
 window.addEventListener('DOMContentLoaded', () => {
+  loadState();
   buildTopics();
   loadKey();
   renderStats();
+  // Restore saved cards to the DOM
+  const area = document.getElementById('cardsArea');
+  const empty = document.getElementById('emptyState');
+  if (state.cards.length > 0) {
+    if (empty) empty.remove();
+    // Render in reverse order (oldest first, newest at top after insertBefore)
+    [...state.cards].reverse().forEach(card => renderCard(card, area));
+    // Restore queue items
+    state.cards.forEach(card => addQueueItem(card));
+  }
+  // Restore topic selection
+  selectTopic(state.topic);
 });
 
 function buildTopics() {
@@ -531,6 +569,7 @@ async function generate() {
     addQueueItem(card);
     renderCard(card, area);
     renderStats();
+    saveState();
 
   } catch (e) {
     shimCard.remove();
@@ -663,6 +702,7 @@ function setStatus(id, action) {
   refreshCard(card);
   updateQueueItem(card);
   renderStats();
+  saveState();
 }
 
 function refreshCard(card) {
@@ -687,6 +727,7 @@ function rejectCard(id) {
   state.undoTimer = setTimeout(() => { toast.style.display = 'none'; state.undoCard = null; }, 4500);
   updateQueueItem({ ...card, status: 'rejected' });
   renderStats();
+  saveState();
 }
 
 function undoReject() {
@@ -701,6 +742,7 @@ function undoReject() {
   state.undoCard = null;
   if (state.undoTimer) clearTimeout(state.undoTimer);
   renderStats();
+  saveState();
 }
 
 // ── Queue / Tracker ──
