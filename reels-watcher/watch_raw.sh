@@ -58,6 +58,7 @@ while :; do
 
     log "new footage $N ($(stat -f %z "$f") bytes)"
     ledger_add "$key"          # claim first so a crash cannot loop forever
+    wait_for_render_slot
     "$HERE/run_edit.sh" "$N" "$f"; rc=$?
     log "$N finished rc=$rc"
     worked=1

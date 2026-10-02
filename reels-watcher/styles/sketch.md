@@ -1,6 +1,6 @@
 STYLE: Sketch. Doodles, chalk underlines, image pops, punchy jump cuts. Playful.
 
-The engine skill for Sketch is installed on the Mac under its old name, `format-1`. Load it and follow it exactly; it is the locked spec Veena approved on reel_7.76 v007. If it is missing, apply the rules below, which are the same rules written out. In every file, note and message, call this style Sketch, never Format 1.
+Sketch is what `~/video-use-watcher/fullpass/build_full.py` produces from a spec: loop cut, cove captions, chalk chorus lines with emoji, butter Baskerville cards, real-photo pops, b-roll slices, pop and chalk SFX. The RUNBOOK in that folder is the engine; the `format-1` skill folder on the Mac is its older write-up. The rules below describe the approved look (reel 7.76 v007 and the 2026-09-24 batch) so the spec you write matches it. In every file, note and message, call this style Sketch, never Format 1.
 
 Cut
 - Pause-strip everything (gap 0.16s, pad-in 0.05, pad-out 0.07). Selective fillers: cut hesitations mid-list, keep voice-carrying ones.

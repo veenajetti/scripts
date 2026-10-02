@@ -13,7 +13,23 @@ Everything runs on the Mac, because that is where the edit engine lives (video-u
 | `run_edit.sh` | called per video | Finds the script text, marks the INDEX row `editing`, runs the headless editor (`claude -p` with the local skills) into `~/Movies/video-use-jobs/reel_<N>/`, runs `verify.sh`, then moves the cut and sidecars to `Done` and marks the row `done` with the Drive link. |
 | `verify.sh` | after every edit | The manual's hard checks: 65s minimum, zero silences of 0.45s or longer, audio and video within 0.15s, 1080x1920. A failing cut stays in `Edited` with a `<N>.FAILED.md` and the row reads `needs review`. |
 
-INDEX status flow: `scripted` → `editing` → `done`, or `needs review` / `edit failed` when something stops it. A daily `INDEX.backup-<date>.csv` is written next to the index before the first change of the day.
+INDEX status flow: `scripted` → `editing` → `edited`, then the existing posting agent moves it to `scheduled` and `posted`. `needs review` or `edit failed` when something stops it. Index writes go through `~/reels-pipeline/reels/pipeline.py` (pull, edit, push over rclone), the same path every other writer on the Mac uses, so nothing races the posting agent's 9/13/17/21 updates. The direct CSV editor in this folder is only the fallback when that module is missing.
+
+## What the Mac already had
+
+The watcher is the trigger. The editing itself is the production pipeline that already lives on the Mac and that every reel so far was cut with by hand:
+
+| Piece | Where | Role |
+|---|---|---|
+| Runbook, build, specs, gates | `~/video-use-watcher/fullpass/` (`RUNBOOK.md`, `build_full.py`, `specs/spec_<no>.json`, `audio_qc.py`, `visual_qc.py`, `contact_sheet.py`, `stumble_qc.py`) | The engine. The headless editor is told to follow the runbook and run the gates. |
+| Job folders | `~/Movies/video-use-jobs/auto_<no>/` | Where builds land (`edit/final_v1.mp4`). The watcher uses the same shape. |
+| Index and captions | `~/reels-pipeline/reels/pipeline.py`, `work/INDEX.csv` | Owner of INDEX.csv over rclone. |
+| Downloads relay | `com.veena.airdrop-relay` → `~/video-use-watcher/airdrop_to_raw.sh` | Edits exports into Raw every 5 min. Reason `reels-ingest` is off. |
+| Instagram posting | scheduled Claude task `native-ig-poster`, 9/13/17/21 Chicago, from her Chrome | Reads `~/reels-pipeline/work/native_queue.json`, runs the gates, posts, sets `posted`. |
+| TikTok | Metricool CSV from `reels/dual_csv.py`, imported by hand | Unchanged. |
+| Cut Room clients | `~/Developer/cutroom/ops/` (`PLAYBOOK.md`, `deliver_reel.py`), `com.cutroom.*` agents | Separate line, does not touch Reels. |
+
+The watcher does not add videos to the posting queue. After a cut lands in Done with status `edited`, scheduling it is still the existing step (`dual_csv.py` for TikTok, the native queue for Instagram).
 
 ## Naming rule
 

@@ -4,7 +4,7 @@ import os, sys
 t = open(sys.argv[1], encoding="utf-8").read()
 style = open(os.environ["STYLE_FILE"], encoding="utf-8").read()
 subs = {
-    "SCRIPT_NO": os.environ["N"], "RAW_FILE": os.environ["RAW"], "JOB_DIR": os.environ["JOB_DIR"],
+    "SCRIPT_NO": os.environ["N"], "SPEC_NO": os.environ["N"].replace(".", ""), "RAW_FILE": os.environ["RAW"], "JOB_DIR": os.environ["JOB_DIR"],
     "SCRIPT_SOURCE": os.environ.get("SRC") or "NONE FOUND", "SCRIPT_DOC": os.environ.get("DOC") or "none",
     "EDITED_DIR": os.environ["EDITED_DIR"], "TITLE": os.environ["TITLE"],
     "STYLE_NAME": os.environ["STYLE_NAME"], "STYLE_BLOCK": style,

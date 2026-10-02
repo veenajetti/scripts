@@ -6,7 +6,27 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/config.env"; source "$HERE/lib.sh"
 
 N="$1"; RAW="$2"
-JOB_DIR="$WORK_DIR/reel_$N"
+
+# INDEX.csv is owned by ~/reels-pipeline/reels/pipeline.py (pull, edit, push over rclone).
+# The native posting agent writes it the same way at 9/13/17/21. Go through it when it exists;
+# writing the Drive mount directly would race those writers.
+set_index() {
+  local no="$1" status="$2" url="${3:-}"
+  if [ -f "$HOME/reels-pipeline/reels/pipeline.py" ]; then
+    ( cd "$HOME/reels-pipeline" && /usr/bin/python3 - "$no" "$status" "$url" <<'PY'
+import sys; sys.path.insert(0, "reels")
+from pipeline import index_update
+no, status, url = sys.argv[1:4]
+fields = {"status": status}
+if url: fields["video_url"] = url
+index_update(no, **fields)
+PY
+    ) && return 0
+    log "pipeline.py index_update failed; falling back to direct CSV edit"
+  fi
+  python3 "$HERE/index_update.py" --index "$INDEX_CSV" --set "$no" --status "$status" ${url:+--video-url "$url"}
+}
+JOB_DIR="$WORK_DIR/auto_$N"   # same shape the gates and the posting queue expect
 mkdir -p "$JOB_DIR/versions" "$EDITED_DIR" "$DONE_DIR" "$LOG_DIR"
 LOG="$LOG_DIR/edit_$N.$(date +%Y%m%d_%H%M%S).log"
 exec >>"$LOG" 2>&1
@@ -30,7 +50,7 @@ fi
 [ -n "$SRC" ] && log "script source: $SRC" || log "no local script text; editor will use Drive connector or flag"
 [ -z "$TITLE" ] && TITLE="$N"
 
-python3 "$HERE/index_update.py" --index "$INDEX_CSV" --set "$N" --status editing --title "$TITLE"
+set_index "$N" editing
 notify "Reels: editing $N" "$TITLE"
 
 # 2. Headless edit with a watchdog.
@@ -59,7 +79,7 @@ log "editor exit code $RC"
 CUT="$EDITED_DIR/$N.mp4"
 if [ ! -s "$CUT" ]; then
   log "no cut delivered"
-  python3 "$HERE/index_update.py" --index "$INDEX_CSV" --set "$N" --status "edit failed"
+  set_index "$N" "edit failed"
   notify "Reels: $N FAILED" "No cut delivered. See $LOG"
   exit 1
 fi
@@ -68,7 +88,7 @@ fi
 if ! "$HERE/verify.sh" "$CUT"; then
   log "verification failed; holding in Edited"
   printf 'Verification failed on %s\n\n%s\n' "$(date)" "$("$HERE/verify.sh" "$CUT" 2>&1)" > "$EDITED_DIR/$N.FAILED.md"
-  python3 "$HERE/index_update.py" --index "$INDEX_CSV" --set "$N" --status "needs review"
+  set_index "$N" "needs review"
   notify "Reels: $N needs review" "Cut failed a hard check. Held in Edited."
   exit 1
 fi
@@ -80,7 +100,9 @@ for side in "$EDITED_DIR/$N.editnotes.txt" "$EDITED_DIR/$N - "*.txt "$EDITED_DIR
 done
 sleep 20  # give Drive a moment to assign the id to the moved file
 URL="$(drive_view_url "$DONE_DIR/$N.mp4")"
-python3 "$HERE/index_update.py" --index "$INDEX_CSV" --set "$N" --status done ${URL:+--video-url "$URL"}
+[ -z "$URL" ] && URL="$(rclone_view_url "Reels/Done/$N.mp4")"
+# "edited" is the status pipeline.py and the posting agent understand; they move it on to scheduled and posted.
+set_index "$N" edited "$URL"
 log "done: $DONE_DIR/$N.mp4 ${URL:-(url pending sync)}"
 notify "Reels: $N is in Done" "$TITLE"
 exit 0
