@@ -31,7 +31,13 @@ cp "$HERE"/styles/*.md "$DEST/styles/"
 chmod +x "$DEST"/*.sh "$DEST"/*.py
 
 echo "== load launch agents"
-for label in com.veena.reels-watcher com.veena.reels-ingest; do
+AGENT_LIST="com.veena.reels-watcher"
+if [ "${INGEST_AGENT:-off}" = "on" ]; then AGENT_LIST="$AGENT_LIST com.veena.reels-ingest"
+else
+  echo "  reels-ingest skipped (INGEST_AGENT=off; com.veena.airdrop-relay handles Downloads)"
+  launchctl bootout "gui/$UID_/com.veena.reels-ingest" 2>/dev/null && echo "  unloaded a previously installed reels-ingest" || true
+fi
+for label in $AGENT_LIST; do
   sed "s|__HOME__|$HOME|g" "$HERE/$label.plist" > "$AGENTS/$label.plist"
   launchctl bootout "gui/$UID_/$label" 2>/dev/null || true
   launchctl bootstrap "gui/$UID_" "$AGENTS/$label.plist"

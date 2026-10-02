@@ -8,7 +8,7 @@ Everything runs on the Mac, because that is where the edit engine lives (video-u
 
 | Piece | Trigger | What it does |
 |---|---|---|
-| `com.veena.reels-ingest` | `~/Downloads` changes | `Edits_C_03_<ts>.mp4` from AirDrop becomes `Raw/C.03.mp4`. An older `C.03.mp4` is moved to `Raw/_superseded`, so no more `9.2.20261002.mp4` twins. |
+| `com.veena.reels-ingest` (off by default) | `~/Downloads` changes | `Edits_C_03_<ts>.mp4` from AirDrop becomes `Raw/C.03.mp4`. An older `C.03.mp4` is moved to `Raw/_superseded`. Off by default because the Mac already runs `com.veena.airdrop-relay` for this; turn on with `INGEST_AGENT="on"` only after unloading the relay. |
 | `com.veena.reels-watcher` | `Reels/Raw` changes, plus every 10 min | Waits for Drive to finish syncing the new file, then runs `run_edit.sh` for it. A lock keeps it to one edit at a time; files that arrive mid-edit are picked up right after. |
 | `run_edit.sh` | called per video | Finds the script text, marks the INDEX row `editing`, runs the headless editor (`claude -p` with the local skills) into `~/Movies/video-use-jobs/reel_<N>/`, runs `verify.sh`, then moves the cut and sidecars to `Done` and marks the row `done` with the Drive link. |
 | `verify.sh` | after every edit | The manual's hard checks: 65s minimum, zero silences of 0.45s or longer, audio and video within 0.15s, 1080x1920. A failing cut stays in `Edited` with a `<N>.FAILED.md` and the row reads `needs review`. |
