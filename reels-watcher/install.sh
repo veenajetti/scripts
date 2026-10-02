@@ -14,8 +14,8 @@ ok=1
 command -v "$CLAUDE_BIN" >/dev/null 2>&1 && echo "  claude CLI found" || { echo "  MISSING: claude CLI (npm i -g @anthropic-ai/claude-code)"; ok=0; }
 [ -x "$FFMPEG_BIN/ffmpeg" ] && echo "  ffmpeg-full found" || { echo "  MISSING: brew install ffmpeg-full"; ok=0; }
 command -v python3 >/dev/null && echo "  python3 found" || { echo "  MISSING: python3"; ok=0; }
-[ -d "$HOME/.claude/skills/clean-pink-edit" ] || [ -d "$HOME/.claude/skills/format-1" ] \
-  && echo "  edit skills present" || echo "  WARNING: no clean-pink-edit or format-1 skill in ~/.claude/skills; the editor will fall back to its own judgment"
+[ -d "$HOME/.claude/skills/format-1" ] && echo "  format-1 skill present" || echo "  WARNING: no format-1 skill in ~/.claude/skills; the editor will use the written brief in styles/format-1.md"
+echo "  edit style: $EDIT_STYLE (change EDIT_STYLE in config.env, then re-run install)"
 if "$CLAUDE_BIN" -p "reply with the single word ready" --max-turns 1 --output-format text 2>/dev/null | grep -qi ready; then
   echo "  claude is logged in"
 else
@@ -24,9 +24,10 @@ fi
 [ "$ok" = 1 ] || { echo "Fix the MISSING items above, then re-run."; exit 1; }
 
 echo "== install files to $DEST"
-mkdir -p "$DEST/prompts" "$DEST/state" "$DEST/logs" "$AGENTS"
+mkdir -p "$DEST/prompts" "$DEST/styles" "$DEST/state" "$DEST/logs" "$AGENTS"
 cp "$HERE"/*.sh "$HERE"/*.py "$HERE"/config.env "$HERE"/claude-settings.json "$DEST/"
 cp "$HERE"/prompts/*.md "$DEST/prompts/"
+cp "$HERE"/styles/*.md "$DEST/styles/"
 chmod +x "$DEST"/*.sh "$DEST"/*.py
 
 echo "== load launch agents"

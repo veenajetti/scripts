@@ -15,6 +15,28 @@ Everything runs on the Mac, because that is where the edit engine lives (video-u
 
 INDEX status flow: `scripted` → `editing` → `done`, or `needs review` / `edit failed` when something stops it. A daily `INDEX.backup-<date>.csv` is written next to the index before the first change of the day.
 
+## Choosing the style
+
+One line in `config.env` decides how every video is cut:
+
+```
+EDIT_STYLE="format-1"
+```
+
+The names match The Cut Room's seven house styles, with a brief for each in `styles/`:
+
+| Setting | Cut Room name | What it is | State |
+|---|---|---|---|
+| `format-1` | Sketch | Doodles, chalk chorus lines, image pops, jump cuts. The locked spec from reel 7.76 v007. | Locked, current default |
+| `studio` | Studio | The old Clean Pink: typewriter cold open, phrase captions, minimal pops. | Locked, retired as default |
+| `bold` | Bold | Big uppercase captions, fast cuts, zero decoration. | Draft, needs one reference cut |
+| `luxe` | Luxe | Word-by-word reveal, italic serif flourish. | Draft |
+| `authority` | Authority | Name-plate lower third, crisp captions, steady pacing. | Draft |
+| `cinema` | Cinema | Letterbox bars, film grade, sparse serif titles. | Draft |
+| `butter-world` | Butter World | One calm take, headline card, polaroid receipts, chapter stickers. 90s and up. | Draft |
+
+The site publishes one line per style, so the five drafts are written from that line plus the house rules. Each draft says so at the top. To lock one: set it, drop one raw, react to the cut, edit the brief, re-run `install.sh`. The brief wins over the "Style 1 / Style 2" label inside a script doc; the doc's anchors, pops, CTA and loop still drive the timing.
+
 ## Install (once, on the Mac)
 
 ```bash
@@ -23,7 +45,7 @@ cd ~/Developer/scripts/reels-watcher
 ./install.sh
 ```
 
-The installer checks for Drive, ffmpeg-full, python3, the claude CLI and a working `claude login`, then copies this folder to `~/reels-watcher`, loads both launch agents, and sets the Mac to never sleep on power. Re-run it after any change to these files.
+Open Terminal on the Mac, paste those four lines, press return. The installer checks for Drive, ffmpeg-full, python3, the claude CLI and a working `claude login`, then copies this folder to `~/reels-watcher`, loads both launch agents, and sets the Mac to never sleep on power. Re-run it after any change to these files.
 
 ## What has to stay true
 

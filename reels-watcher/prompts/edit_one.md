@@ -10,7 +10,12 @@ JOB
 - Also write: {{EDITED_DIR}}/{{SCRIPT_NO}}.editnotes.txt (the EDIT NOTES block you cut to) and {{EDITED_DIR}}/{{SCRIPT_NO}} - {{TITLE}}.txt (plain text of the script doc).
 
 RULES
-1. Load the local skills before cutting: `video-use` (engine), `format-1` (locked cut rules, A/V sync patch, silence audit), and `clean-pink-edit` (Style 2). The script doc's EDIT NOTES block decides the style: "Style 2" or "Clean Pink" means clean-pink-edit; "Style 1" or "doodle" means the format-1 graphics layer. No notes means Style 2.
+1. STYLE. Load the local `video-use` skill (engine) and then apply the style brief below. The brief is authoritative: ignore the "Style 1 / Style 2" label inside the script doc's EDIT NOTES, and reuse that block only for its ANCHOR phrases, pops, CTA, BEATS and LOOP.
+
+--- STYLE BRIEF: {{STYLE_NAME}} ---
+{{STYLE_BLOCK}}
+--- END STYLE BRIEF ---
+
 2. `export PATH="/opt/homebrew/opt/ffmpeg-full/bin:$PATH"` before any ffmpeg call. Core Homebrew ffmpeg fails on this footage.
 3. The `|` in the script is the loop cut. Open on the sentence after it, end on the sentence before it.
 4. Hard checks before you deliver, every one: duration at least 65s; `silencedetect=n=-32dB:d=0.45` returns zero hits; video and audio stream durations within 0.15s; 1080x1920. Fix and re-render until all four pass. Never deliver a cut that fails one.
