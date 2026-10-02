@@ -10,7 +10,7 @@ JOB
 - Also write: {{EDITED_DIR}}/{{SCRIPT_NO}}.editnotes.txt (the EDIT NOTES block you cut to) and {{EDITED_DIR}}/{{SCRIPT_NO}} - {{TITLE}}.txt (plain text of the script doc).
 
 RULES
-1. STYLE. Load the local `video-use` skill (engine) and then apply the style brief below. The brief is authoritative: ignore the "Style 1 / Style 2" label inside the script doc's EDIT NOTES, and reuse that block only for its ANCHOR phrases, pops, CTA, BEATS and LOOP.
+1. STYLE. Load the local `video-use` skill (engine) and then apply the style brief below. The brief is authoritative: ignore any style label inside the script doc's EDIT NOTES (old docs say "Style 1", "Style 2", "Format 1" or "Clean Pink"), and reuse that block only for its ANCHOR phrases, pops, CTA, BEATS and LOOP.
 
 --- STYLE BRIEF: {{STYLE_NAME}} ---
 {{STYLE_BLOCK}}
@@ -24,4 +24,4 @@ RULES
 7. If you hit a blocker you cannot clear in 60 minutes (missing key, engine failure), write `{{EDITED_DIR}}/{{SCRIPT_NO}}.FAILED.md` with the exact error and exit non-zero. Do not leave a half-written mp4 in Edited; render to the job folder and copy only when complete.
 8. Touch nothing else in Drive. The watcher moves the cut to Done and updates INDEX.csv after its own verification.
 
-Finish with: files written, final duration, number of cuts, style used, anything flagged.
+Finish with: files written, final duration, number of cuts, style used (by its Cut Room name), anything flagged.

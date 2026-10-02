@@ -35,7 +35,7 @@ notify "Reels: editing $N" "$TITLE"
 
 # 2. Headless edit with a watchdog.
 STYLE_FILE="$HERE/styles/$EDIT_STYLE.md"
-[ -f "$STYLE_FILE" ] || { log "unknown EDIT_STYLE '$EDIT_STYLE'; falling back to format-1"; STYLE_FILE="$HERE/styles/format-1.md"; }
+[ -f "$STYLE_FILE" ] || { log "unknown EDIT_STYLE '$EDIT_STYLE'; falling back to sketch"; STYLE_FILE="$HERE/styles/sketch.md"; }
 STYLE_NAME="$(basename "$STYLE_FILE" .md)"
 log "style: $STYLE_NAME"
 export N RAW JOB_DIR SRC DOC EDITED_DIR TITLE STYLE_NAME STYLE_FILE

@@ -15,27 +15,36 @@ Everything runs on the Mac, because that is where the edit engine lives (video-u
 
 INDEX status flow: `scripted` → `editing` → `done`, or `needs review` / `edit failed` when something stops it. A daily `INDEX.backup-<date>.csv` is written next to the index before the first change of the day.
 
+## Naming rule
+
+The Cut Room's names are the only names. A style is called what thecutroom.ai calls it, in config, in file names, in INDEX.csv, in edit notes, in chat. The old internal labels are retired:
+
+| Retired label | Cut Room name |
+|---|---|
+| Format 1, Style 1, doodle edit | Sketch |
+| Clean Pink, Style 2 | Studio |
+
+Two engine skills on the Mac still carry old folder names (`~/.claude/skills/format-1` and `clean-pink-edit`) because renaming a skill folder changes nothing visible and risks breaking the engine. The style briefs point at them by those paths. Everything a person reads says Sketch and Studio.
+
 ## Choosing the style
 
 One line in `config.env` decides how every video is cut:
 
 ```
-EDIT_STYLE="format-1"
+EDIT_STYLE="sketch"
 ```
 
-The names match The Cut Room's seven house styles, with a brief for each in `styles/`:
+| Setting | What it is | State |
+|---|---|---|
+| `sketch` | Doodles, chalk chorus lines, image pops, jump cuts. The locked spec from reel 7.76 v007. | Locked, current default |
+| `studio` | Typewriter cold open, phrase captions, minimal pops. | Locked, retired as default |
+| `bold` | Big uppercase captions, fast cuts, zero decoration. | Draft, needs one reference cut |
+| `luxe` | Word-by-word reveal, italic serif flourish. | Draft |
+| `authority` | Name-plate lower third, crisp captions, steady pacing. | Draft |
+| `cinema` | Letterbox bars, film grade, sparse serif titles. | Draft |
+| `butter-world` | One calm take, headline card, polaroid receipts, chapter stickers. 90s and up. | Draft |
 
-| Setting | Cut Room name | What it is | State |
-|---|---|---|---|
-| `format-1` | Sketch | Doodles, chalk chorus lines, image pops, jump cuts. The locked spec from reel 7.76 v007. | Locked, current default |
-| `studio` | Studio | The old Clean Pink: typewriter cold open, phrase captions, minimal pops. | Locked, retired as default |
-| `bold` | Bold | Big uppercase captions, fast cuts, zero decoration. | Draft, needs one reference cut |
-| `luxe` | Luxe | Word-by-word reveal, italic serif flourish. | Draft |
-| `authority` | Authority | Name-plate lower third, crisp captions, steady pacing. | Draft |
-| `cinema` | Cinema | Letterbox bars, film grade, sparse serif titles. | Draft |
-| `butter-world` | Butter World | One calm take, headline card, polaroid receipts, chapter stickers. 90s and up. | Draft |
-
-The site publishes one line per style, so the five drafts are written from that line plus the house rules. Each draft says so at the top. To lock one: set it, drop one raw, react to the cut, edit the brief, re-run `install.sh`. The brief wins over the "Style 1 / Style 2" label inside a script doc; the doc's anchors, pops, CTA and loop still drive the timing.
+The site publishes one line per style, so the five drafts are written from that line plus the house rules. Each draft says so at the top. To lock one: set it, drop one raw, react to the cut, edit the brief, re-run `install.sh`. The brief wins over any style label inside a script doc; the doc's anchors, pops, CTA and loop still drive the timing.
 
 ## Install (once, on the Mac)
 

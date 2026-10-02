@@ -1,6 +1,6 @@
-STYLE: Format 1 (Cut Room name: Sketch). Doodles, chalk underlines, image pops, punchy jump cuts. Playful.
+STYLE: Sketch. Doodles, chalk underlines, image pops, punchy jump cuts. Playful.
 
-Load the local `format-1` skill and follow it exactly; it is the locked spec Veena approved on reel_7.76 v007. If the skill is missing, apply the rules below, which are the same rules written out.
+The engine skill for Sketch is installed on the Mac under its old name, `format-1`. Load it and follow it exactly; it is the locked spec Veena approved on reel_7.76 v007. If it is missing, apply the rules below, which are the same rules written out. In every file, note and message, call this style Sketch, never Format 1.
 
 Cut
 - Pause-strip everything (gap 0.16s, pad-in 0.05, pad-out 0.07). Selective fillers: cut hesitations mid-list, keep voice-carrying ones.
@@ -24,4 +24,4 @@ Captions
 Sound
 - Pop cue on every element landing, chalk cue on every write or draw. Composite, then audio-only remux; loudnorm -14 LUFS.
 
-From the script doc's EDIT NOTES, reuse the ANCHOR phrases, keyword pops, image pops, CTA line and LOOP as the timing map. Ignore its style label and any Clean Pink specifics (pink typewriter, signature card).
+From the script doc's EDIT NOTES, reuse the ANCHOR phrases, keyword pops, image pops, CTA line and LOOP as the timing map. Ignore its style label and any Studio specifics (pink typewriter, signature card).

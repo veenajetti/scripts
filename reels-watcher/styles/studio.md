@@ -1,6 +1,6 @@
-STYLE: Studio (previously "Clean Pink", Style 2). Typewriter cold open, elegant phrase captions, minimal pops. Clean.
+STYLE: Studio. Typewriter cold open, elegant phrase captions, minimal pops. Clean.
 
-Load the local `clean-pink-edit` skill and follow it. Four text layers, two image pops, hard cuts, fixed stimulus clock:
+The engine skill for Studio is installed under its old name, `clean-pink-edit`. Load it and follow it. In every file, note and message, call this style Studio, never Clean Pink or Style 2. Four text layers, two image pops, hard cuts, fixed stimulus clock:
 - Cold open: second half of the loop sentence types on in pale pink #F6D4EC with a thin cursor, 12 to 15 characters per second.
 - Running captions: small white sans, regular, soft shadow, lowercase, 3 to 9 words, two lines max, one per breath group.
 - Keyword pops: 3 to 5, large near-white or pale pink, upper half, typewriter reveal, hold 1 to 2s, hard cut off.

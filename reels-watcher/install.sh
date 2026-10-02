@@ -14,7 +14,7 @@ ok=1
 command -v "$CLAUDE_BIN" >/dev/null 2>&1 && echo "  claude CLI found" || { echo "  MISSING: claude CLI (npm i -g @anthropic-ai/claude-code)"; ok=0; }
 [ -x "$FFMPEG_BIN/ffmpeg" ] && echo "  ffmpeg-full found" || { echo "  MISSING: brew install ffmpeg-full"; ok=0; }
 command -v python3 >/dev/null && echo "  python3 found" || { echo "  MISSING: python3"; ok=0; }
-[ -d "$HOME/.claude/skills/format-1" ] && echo "  format-1 skill present" || echo "  WARNING: no format-1 skill in ~/.claude/skills; the editor will use the written brief in styles/format-1.md"
+[ -d "$HOME/.claude/skills/format-1" ] && echo "  sketch engine skill present (installed on the Mac as format-1)" || echo "  WARNING: no format-1 skill in ~/.claude/skills; Sketch will use the written brief in styles/sketch.md"
 echo "  edit style: $EDIT_STYLE (change EDIT_STYLE in config.env, then re-run install)"
 if "$CLAUDE_BIN" -p "reply with the single word ready" --max-turns 1 --output-format text 2>/dev/null | grep -qi ready; then
   echo "  claude is logged in"
