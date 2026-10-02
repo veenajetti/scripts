@@ -1,5 +1,5 @@
 #!/bin/bash
-# verify.sh <cut.mp4>  -- the mandatory checks from the Format 1 manual.
+# verify.sh <cut.mp4>  -- the mandatory checks from the house editing manual.
 # Exit 0 = ship it. Exit 1 = hold in Edited with a FAILED note.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"

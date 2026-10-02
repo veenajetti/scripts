@@ -4,7 +4,7 @@ Event-driven editing for `My Drive/Reels`. A file lands in `Raw`, the edit start
 
 ## What runs where
 
-Everything runs on the Mac, because that is where the edit engine lives (video-use, ffmpeg-full, the Clean Pink and Format 1 skills, the fonts and doodle library). The cloud cannot do this part.
+Everything runs on the Mac, because that is where the edit engine lives (video-use, ffmpeg-full, the Sketch and Studio engine skills, the fonts and doodle library). The cloud cannot do this part.
 
 | Piece | Trigger | What it does |
 |---|---|---|
