@@ -8,11 +8,17 @@ mkdir -p "$STATE_DIR" "$LOG_DIR" "$SUPERSEDED_DIR"
 exec >>"$LOG_DIR/watch.log" 2>&1
 
 LOCK="$STATE_DIR/lock"
+# A lock left by a killed run (launchctl kickstart -k, reboot) must not block forever:
+# it holds the owner's pid, and a dead owner means the lock is stale.
+if [ -d "$LOCK" ] && [ -f "$LOCK/pid" ] && ! kill -0 "$(cat "$LOCK/pid")" 2>/dev/null; then
+  log "removing stale lock from pid $(cat "$LOCK/pid")"; rm -rf "$LOCK"
+fi
 if ! mkdir "$LOCK" 2>/dev/null; then
   # A run is active. It re-scans Raw before exiting, so the new file is not lost.
   exit 0
 fi
-trap 'rmdir "$LOCK" 2>/dev/null' EXIT
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK" 2>/dev/null' EXIT
 caffeinate -i -w $$ &
 
 [ -d "$RAW_DIR" ] || { log "Raw folder missing: $RAW_DIR (is Google Drive running?)"; exit 0; }
