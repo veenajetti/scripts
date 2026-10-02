@@ -63,6 +63,10 @@ Open Terminal on the Mac, paste those four lines, press return. The installer ch
 - `claude login` has been done once in Terminal. This was the blocker on the earlier 01_INBOX watcher.
 - The ElevenLabs key is still in `~/Developer/video-use/.env` for transcription.
 
+## Keeping the Mac reachable from the app
+
+`remote-control/install_remote_control.sh` installs a launchd agent (`com.veena.remote-control`) that runs `claude remote-control` for `~/Developer/scripts` at login and restarts it whenever it exits. With it loaded, the Mac is always listed as an environment when you start a session in the Claude Code app, so you never need a Terminal window open for that. Its log is `~/reels-watcher/logs/remote-control.log`. To stop it: `launchctl bootout gui/$(id -u)/com.veena.remote-control`.
+
 ## Watching it work
 
 ```bash
