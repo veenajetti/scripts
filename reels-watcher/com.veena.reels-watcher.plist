@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.veena.reels-watcher</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__HOME__/reels-watcher/watch_raw.sh</string>
+  </array>
+  <!-- Fires the moment anything changes inside Raw. -->
+  <key>WatchPaths</key>
+  <array>
+    <string>__HOME__/Library/CloudStorage/GoogleDrive-veena@vivefunds.com/My Drive/Reels/Raw</string>
+  </array>
+  <!-- Safety net in case a filesystem event is missed. -->
+  <key>StartInterval</key><integer>600</integer>
+  <key>RunAtLoad</key><true/>
+  <key>ThrottleInterval</key><integer>30</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/opt/ffmpeg-full/bin:/opt/homebrew/bin:/usr/local/bin:__HOME__/.local/bin:/usr/bin:/bin</string>
+    <key>HOME</key><string>__HOME__</string>
+  </dict>
+  <key>StandardOutPath</key><string>__HOME__/reels-watcher/logs/launchd.out.log</string>
+  <key>StandardErrorPath</key><string>__HOME__/reels-watcher/logs/launchd.err.log</string>
+</dict>
+</plist>

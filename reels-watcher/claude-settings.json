@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash", "Read", "Write", "Edit", "Glob", "Grep", "Skill",
+      "mcp__Google_Drive__*", "mcp__gdrive__*"
+    ],
+    "deny": [
+      "Bash(rm -rf /*)", "Bash(git push*)", "mcp__Gmail__*", "mcp__Slack__*"
+    ]
+  }
+}
