@@ -49,7 +49,7 @@ The site publishes one line per style, so the five drafts are written from that 
 ## Install (once, on the Mac)
 
 ```bash
-git clone <this repo> ~/Developer/scripts   # or pull if it is already there
+git clone -b claude/airdropped-edits-files-8io5o5 https://github.com/veenajetti/scripts ~/Developer/scripts
 cd ~/Developer/scripts/reels-watcher
 ./install.sh
 ```
@@ -72,6 +72,10 @@ launchctl print gui/$(id -u)/com.veena.reels-watcher | head -20
 ```
 
 You also get a macOS banner at each step: uploaded, editing, in Done, or needs review.
+
+## First run
+
+On first load the watcher scans everything already in Raw. A raw whose script number already has a newer cut in Done or Edited is marked handled and skipped. Only raws with no cut, or a raw newer than its cut, get edited. Re-running `install.sh` restarts the agents and interrupts any edit in progress; that edit is retried only if you clear its line from the ledger.
 
 ## Re-running a video
 

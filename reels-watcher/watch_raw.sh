@@ -39,6 +39,17 @@ while :; do
       log "renamed $base -> $N.mp4"
     fi
 
+    # Already cut? A newer <N>.mp4 in Done or Edited means this raw was handled
+    # before the watcher existed. Only a raw newer than its cut gets re-edited.
+    skip=0
+    for cut in "$DONE_DIR/$N.mp4" "$EDITED_DIR/$N.mp4"; do
+      if [ -e "$cut" ] && [ "$cut" -nt "$f" ]; then skip=1; fi
+    done
+    if [ "$skip" = 1 ]; then
+      key="$(ledger_key "$N" "$f")"; ledger_has "$key" || { ledger_add "$key"; log "skip $N: a newer cut already exists"; }
+      continue
+    fi
+
     key="$(ledger_key "$N" "$f")"
     ledger_has "$key" && continue
     wait_until_stable "$f" || continue
